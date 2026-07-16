@@ -1,0 +1,15 @@
+import torch.nn as nn
+
+class FeedForward(nn.Module):
+    def __init__(self, d_model, d_ffn, dropout=0.1, activation=nn.GELU()):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(d_model, d_ffn),
+            activation,
+            nn.Dropout(dropout),
+            nn.Linear(d_ffn, d_model),
+            nn.Dropout(dropout)
+        )
+
+    def forward(self, x):
+        return self.net(x)
