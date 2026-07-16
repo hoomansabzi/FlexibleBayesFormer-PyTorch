@@ -1,42 +1,64 @@
-# FlexibleBayesFormer-PyTorch
+# FlexibleBayesFormer & BayesianWindTunnels
 
-**FlexibleBayesFormer** is a highly modular, research-oriented Transformer architecture designed specifically for deep theoretical analysis, studying learning dynamics, and conducting Information Bottleneck (IB) / Information Plane experiments. 
+A highly modular Transformer architecture and a suite of diagnostic data environments designed for deep theoretical analysis, mechanistic interpretability, and Information Bottleneck (IB) experiments.
 
-Unlike standard production-focused Transformers, this codebase prioritizes hyper-granularity and experimental control. It allows researchers to manipulate individual components of the network—such as freezing specific weight matrices, toggling residual streams, and altering head dimensions layer-by-layer—to empirically test mechanistic interpretability theories (e.g., *Birth of a Transformer: A Memory Viewpoint*).
-
----
-
-## 🚀 Key Properties & Abilities
-
-### 1. Granular Attention Control
-* **Decoupled Dimensions:** Supports separate dimensions for Queries/Keys ($d_{qk}$) and Values ($d_v$). 
-* **Independent Matrix Freezing:** You can independently freeze (disable gradient updates for) $W_Q$, $W_K$, $W_V$, and $W_O$.
-* **Identity Mapping:** Easily force $W_Q$ and $W_K$ to act as Identity matrices to simulate direct associative memory lookups.
-
-### 2. Information Bottleneck & Plane Analysis
-* **Swappable Activations:** The FeedForward Network (FFN) accepts arbitrary PyTorch activation functions (e.g., `nn.GELU()`, `nn.Tanh()`, `nn.ReLU()`). This is critical for computing mutual information and studying how different non-linearities shape the Information Plane during training.
-
-### 3. Dynamic & Asymmetric Architecture
-* **Variable Heads per Layer:** You can pass a list of integers to `n_heads` to specify a different number of attention heads for each layer.
-* **Toggleable Residual Streams:** Residual connections (skip connections) can be turned on or off *independently* for the Attention block (`use_res_attn`) and the MLP block (`use_res_ffn`) on a per-layer basis.
-* **Toggleable MLPs:** Completely bypass the FeedForward layer if desired (`use_ffn=False`).
-
-### 4. Advanced Positional Encodings
-Supports multiple state-of-the-art positional encoding schemes out of the box:
-* **APE (Absolute Positional Embeddings):** Standard learned positional embeddings.
-* **RoPE (Rotary Position Embeddings):** Dynamically applies rotary embeddings correctly scaled to the specific $Q/K$ head dimension of each layer.
-* **ALiBi (Attention with Linear Biases):** Applies distance-based penalties to attention scores without modifying the input embeddings.
+Designed for experimental control rather than production, this codebase allows researchers to manipulate individual network components and evaluate them in perfectly controlled, exact-Bayesian testing environments to study theories like *Birth of a Transformer*.
 
 ---
 
-## 📂 Codebase Structure
+## 🧠 FlexibleBayesFormer (The Architecture)
+
+A hyper-granular Transformer model allowing layer-by-layer architectural control.
+
+* **Granular Attention Control:** * Decoupled dimensions for Queries/Keys ($d_{qk}$) and Values ($d_v$).
+* Independently freeze $W_Q$, $W_K$, $W_V$, and $W_O$.
+* Force $W_Q$ and $W_K$ to act as Identity matrices for pure associative memory lookups.
+
+
+* **Dynamic & Asymmetric Layers:**
+* Define a different number of attention heads per layer.
+* Independently toggle residual streams on/off for Attention and MLP blocks.
+* Bypass FeedForward layers entirely if desired.
+
+
+* **Information Plane Ready:** Swappable FFN activation functions (GELU, Tanh, ReLU) for computing mutual information.
+* **Positional Encodings:** Supports APE (Absolute), RoPE (Rotary, scaled correctly to decoupled head dims), and ALiBi (Linear Biases).
+
+---
+
+## 🌪️ BayesianWindTunnels (The Environments)
+
+A suite of synthetic data generators that provide both training sequences and exact Bayesian posteriors for evaluating specific cognitive primitives in Transformers.
+
+* **Associative Recall (`associative_recall.py`):** * Tests pure memory capacity and the formation of **Induction Heads**.
+* Generates separate Storage and Retrieval phases to isolate exact $W_K, W_Q, W_V$ copying dynamics.
+
+
+* **Bijection (`bijection.py`):** * Tests **deductive reasoning** and process-of-elimination.
+* Models must track a shrinking pool of available mappings to deduce unseen "trivial pairs."
+* Supports variable `repeat_prob` and `repeat_mode` ('anywhere' vs. 'last_only') to contrast logic vs. memory.
+
+
+* **Hidden Markov Model (`hmm.py`):** * Tests **recursive belief updating** and Bayesian state tracking across sequential observations.
+
+---
+
+## 📂 Project Structure
 
 ```text
-FlexibleBayesFormer/
+Project_Root/
 │
-├── __init__.py
-├── ffn.py          # Modular FeedForward with custom activations
-├── attention.py    # FlexMultiHeadAttention with granular matrix freezing & decoupled dims
-├── block.py        # FlexTransformerBlock with independent residual toggles
-└── model.py        # Master FlexFormer class orchestrating dynamic layer configurations
+├── FlexibleBayesFormer/
+│   ├── __init__.py
+│   ├── ffn.py          # FeedForward with custom activations
+│   ├── attention.py    # MultiHeadAttention with granular matrix freezing & decoupled dims
+│   ├── block.py        # TransformerBlock with independent residual toggles
+│   └── model.py        # Master FlexFormer orchestrating dynamic layer configurations
+│
+└── BayesianWindTunnels/
+    ├── __init__.py
+    ├── associative_recall.py  # Tests memory & induction heads
+    ├── bijection.py           # Tests deduction & process-of-elimination
+    └── hmm.py                 # Tests recursive belief updating
+
 ```
