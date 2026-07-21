@@ -3,6 +3,51 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
+def rotate_half(x):
+    """Rotates half the hidden dims of the input."""
+    x1 = x[..., :x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2:]
+    return torch.cat((-x2, x1), dim=-1)
+
+def apply_rope(x, cos, sin):
+    """Applies Rotary Position Embedding to the query/key tensors."""
+    # cos, sin shape from Model.py: (1, T, 1, head_dim // 2)
+    # x shape: (B, n_heads, T, head_dim)
+    
+    # Transpose to align dimensions: (1, 1, T, head_dim // 2)
+    cos = cos.transpose(1, 2)
+    sin = sin.transpose(1, 2)
+    
+    # Duplicate cos/sin to match the full head_dim
+    cos = torch.cat([cos, cos], dim=-1)
+    sin = torch.cat([sin, sin], dim=-1)
+    
+    # Apply rotation
+    return (x * cos) + (rotate_half(x) * sin)
+
+def get_alibi_slopes(n_heads):
+    """Calculates ALiBi slopes for attention bias."""
+    def get_slopes_power_of_2(n):
+        start = (2**(-2**-(math.log2(n)-3)))
+        ratio = start
+        return [start*ratio**i for i in range(n)]
+    
+    if math.log2(n_heads).is_integer():
+        slopes = get_slopes_power_of_2(n_heads)
+    else:
+        closest_power_of_2 = 2**math.floor(math.log2(n_heads))
+        slopes = get_slopes_power_of_2(closest_power_of_2) + get_slopes_power_of_2(2*closest_power_of_2)[0::2][:n_heads-closest_power_of_2]
+    return torch.tensor(slopes)
+
+class FlexMultiHeadAttention(nn.Module):
+    def __init__(self, d_model, n_heads, d_qk=None, dropout=0.1, pe_type="APE",
+...
+
 class FlexMultiHeadAttention(nn.Module):
     def __init__(self, d_model, n_heads, d_qk=None, dropout=0.1, pe_type="APE",
                  freeze_q=False, freeze_k=False, freeze_v=False, freeze_o=False):
