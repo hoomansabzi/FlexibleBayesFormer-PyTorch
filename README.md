@@ -6,7 +6,9 @@ Together they answer one kind of question: how little of a transformer is needed
 posterior exactly, and what circuit it builds to do so.
 
 This is the code used in the MSc thesis *The Minimal Machinery of Bayesian Computation in
-Transformers* (Hooman Sabzi, University of Padova, 2026).
+Transformers* (Hooman Sabzi, University of Padova, 2026). The thesis, its experiments and their
+results are in
+[Minimal-Machinery-Bayesian-Transformers](https://github.com/hoomansabzi/Minimal-Machinery-Bayesian-Transformers).
 
 ## FlexibleBayesFormer: the model
 
