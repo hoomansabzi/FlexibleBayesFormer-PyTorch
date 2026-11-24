@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flexible-bayes-former"
+version = "1.0.0"
+description = "A small transformer with every component switchable, and sequence tasks with exact Bayesian posteriors."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Hooman Sabzi" }]
+requires-python = ">=3.10"
+dependencies = ["torch>=2.0"]
+
+[project.urls]
+Repository = "https://github.com/hoomansabzi/FlexibleBayesFormer-PyTorch"
+
+[tool.setuptools]
+packages = ["FlexibleBayesFormer", "BayesianWindTunnels"]
